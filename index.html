@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>九宫神卦排盘系统 - 在线版</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #8B0000;
+            --primary-light: #B22222;
+            --secondary-color: #2c3e50;
+            --background-color: #f8f9fa;
+            --text-color: #333;
+            --border-color: #e0e0e0;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", "微软雅黑", sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-color);
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            color: white;
+            text-align: center;
+            padding: 25px 20px;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .app-icon {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+        }
+        
+        .input-section {
+            padding: 25px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.1);
+        }
+        
+        .switch-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .switch-label {
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(139, 0, 0, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(-1px);
+        }
+        
+        .result-section {
+            padding: 25px;
+        }
+        
+        .time-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border-left: 5px solid var(--primary-color);
+        }
+        
+        .time-info h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .time-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            font-size: 15px;
+        }
+        
+        .jiugong-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        
+        .palace {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 18px;
+            text-align: center;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: all 0.3s;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+        
+        .palace:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        
+        .palace-name {
+            font-weight: bold;
+            font-size: 17px;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+        }
+        
+        .palace-content {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .palace-item {
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        .fixed-info {
+            color: #666;
+        }
+        
+        .color-fire {
+            color: #FF4444;
+            font-weight: 600;
+        }
+        
+        .color-water {
+            color: #3399FF;
+            font-weight: 600;
+        }
+        
+        .color-earth {
+            color: #CC6600;
+            font-weight: 600;
+        }
+        
+        .color-wood {
+            color: #33CC33;
+            font-weight: 600;
+        }
+        
+        .color-metal {
+            color: #FFCC00;
+            font-weight: 600;
+        }
+        
+        .interpretation {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 25px;
+        }
+        
+        .interpretation h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .interpretation-content {
+            font-size: 15px;
+            line-height: 1.7;
+        }
+        
+        .palace-interpretation {
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px dashed #ddd;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+            display: none;
+        }
+        
+        .spinner {
+            border: 5px solid rgba(0, 0, 0, 0.1);
+            border-left-color: var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 14px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        @media (max-width: 600px) {
+            .jiugong-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .palace {
+                min-height: 180px;
+            }
+            
+            .time-details {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .jiugong-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 26px;
+            }
+        }
+        
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="app-icon">
+                <i class="fas fa-yin-yang"></i>
+            </div>
+            <h1>九宫神卦排盘系统</h1>
+            <p>传统玄学智慧 · 现代科技呈现</p>
+        </div>
+        
+        <div class="input-section">
+            <div class="form-group">
+                <label for="name"><i class="fas fa-user"></i> 姓名</label>
+                <input type="text" id="name" placeholder="请输入您的姓名">
+            </div>
+            
+            <div class="form-group">
+                <label for="time"><i class="fas fa-calendar-alt"></i> 排盘时间</label>
+                <input type="datetime-local" id="time">
+            </div>
+            
+            <div class="form-group">
+                <label for="number"><i class="fas fa-hashtag"></i> 报数（可选）</label>
+                <input type="number" id="number" placeholder="请输入1-9的数字" min="1" max="9">
+            </div>
+            
+            <div class="form-group">
+                <label for="chineseChar"><i class="fas fa-font"></i> 汉字（可选）</label>
+                <input type="text" id="chineseChar" placeholder="请输入一个汉字" maxlength="1">
+            </div>
+            
+            <div class="switch-group">
+                <span class="switch-label">使用报数</span>
+                <label class="switch">
+                    <input type="checkbox" id="useNumber">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="switch-group">
+                <span class="switch-label">使用汉字</span>
+                <label class="switch">
+                    <input type="checkbox" id="useChineseChar">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <button class="btn" id="calculateBtn">
+                <i class="fas fa-calculator"></i>
+                开始排盘
+            </button>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>正在排盘，请稍候...</p>
+        </div>
+        
+        <div class="result-section" id="resultSection" style="display: none;">
+            <div class="time-info">
+                <h3><i class="fas fa-clock"></i> 排盘时间信息</h3>
+                <div class="time-details" id="timeInfo"></div>
+            </div>
+            
+            <h3 style="margin-bottom: 15px; color: var(--primary-color);">
+                <i class="fas fa-th"></i> 九宫神卦排盘结果
+            </h3>
+            
+            <div class="jiugong-grid" id="jiugongGrid">
+                <!-- 九宫格将通过JavaScript动态生成 -->
+            </div>
+            
+            <div class="interpretation">
+                <h3><i class="fas fa-book-open"></i> 卦象解读</h3>
+                <div class="interpretation-content" id="interpretationContent"></div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>九宫神卦排盘系统 &copy; 2023 - 传统智慧与现代技术的完美结合</p>
+        </div>
+    </div>
+
+    <script>
+        // 初始化时间字段为当前时间
+        function initializeDateTime() {
+            const now = new Date();
+            // 调整时区问题，确保显示正确的时间
+            const timezoneOffset = now.getTimezoneOffset() * 60000;
+            const localTime = new Date(now - timezoneOffset);
+            document.getElementById('time').value = localTime.toISOString().slice(0, 16);
+        }
+        
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDateTime();
+            
+            // 添加动画类
+            document.querySelector('.container').classList.add('fade-in');
+        });
+
+        // 农历计算核心函数
+        class LunarCalendar {
+            constructor() {
+                this.lunarInfo = [
+                    0x04bd8, 0x04ae0, 0x0a570, 0x054d5, 0x0d260, 0x0d950, 0x16554, 0x056a0, 0x09ad0, 0x055d2,
+                    0x04ae0, 0x0a5b6, 0x0a4d0, 0x0d250, 0x1d255, 0x0b540, 0x0d6a0, 0x0ada2, 0x095b0, 0x14977,
+                    0x04970, 0x0a4b0, 0x0b4b5, 0x06a50, 0x06d40, 0x1ab54, 0x02b60, 0x09570, 0x052f2, 0x04970,
+                    0x06566, 0x0d4a0, 0x0ea50, 0x06e95, 0x05ad0, 0x02b60, 0x186e3, 0x092e0, 0x1c8d7, 0x0c950,
+                    0x0d4a0, 0x1d8a6, 0x0b550, 0x056a0, 0x1a5b4, 0x025d0, 0x092d0, 0x0d2b2, 0x0a950, 0x0b557,
+                    0x06ca0, 0x0b550, 0x15355, 0x04da0, 0x0a5b0, 0x14573, 0x052b0, 0x0a9a8, 0x0e950, 0x06aa0,
+                    0x0aea6, 0x0ab50, 0x04b60, 0x0aae4, 0x0a570, 0x05260, 0x0f263, 0x0d950, 0x05b57, 0x056a0,
+                    0x096d0, 0x04dd5, 0x04ad0, 0x0a4d0, 0x0d4d4, 0x0d250, 0x0d558, 0x0b540, 0x0b6a0, 0x195a6,
+                    0x095b0, 0x049b0, 0x0a974, 0x0a4b0, 0x0b27a, 0x06a50, 0x06d40, 0x0af46, 0x0ab60, 0x09570,
+                    0x04af5, 0x04970, 0x064b0, 0x074a3, 0x0ea50, 0x06b58, 0x055c0, 0x0ab60, 0x096d5, 0x092e0,
+                    0x0c960, 0x0d954, 0x0d4a0, 0x0da50, 0x07552, 0x056a0, 0x0abb7, 0x025d0, 0x092d0, 0x0cab5,
+                    0x0a950, 0x0b4a0, 0x0baa4, 0x0ad50, 0x055d9, 0x04ba0, 0x0a5b0, 0x15176, 0x052b0, 0x0a930,
+                    0x07954, 0x06aa0, 0x0ad50, 0x05b52, 0x04b60, 0x0a6e6, 0x0a4e0, 0x0d260, 0x0ea65, 0x0d530,
+                    0x05aa0, 0x076a3, 0x096d0, 0x04afb, 0x04ad0, 0x0a4d0, 0x1d0b6, 0x0d250, 0x0d520, 0x0dd45,
+                    0x0b5a0, 0x056d0, 0x055b2, 0x049b0, 0x0a577, 0x0a4b0, 0x0aa50, 0x1b255, 0x06d20, 0x0ada0
+                ];
+                
+                this.tianGan = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
+                this.diZhi = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
+                this.zodiacAnimals = ["鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊", "猴", "鸡", "狗", "猪"];
+                this.lunarMonths = ["正", "二", "三", "四", "五", "六", "七", "八", "九", "十", "冬", "腊"];
+            }
+            
+            solarToLunar(solarDate) {
+                let year = solarDate.getFullYear();
+                let month = solarDate.getMonth() + 1;
+                let day = solarDate.getDate();
+                
+                let offset = Math.floor((Date.UTC(year, month-1, day) - Date.UTC(1900, 0, 31)) / 86400000);
+                
+                let i, temp = 0;
+                for (i = 1900; i < 2101 && offset > 0; i++) {
+                    temp = this.lunarYearDays(i);
+                    offset -= temp;
+                }
+                
+                if (offset < 0) {
+                    offset += temp;
+                    i--;
+                }
+                
+                let lunarYear = i;
+                let leap = this.leapMonth(i);
+                let isLeap = false;
+                
+                for (i = 1; i < 13 && offset > 0; i++) {
+                    if (leap > 0 && i === (leap + 1) && !isLeap) {
+                        i--;
+                        isLeap = true;
+                        temp = this.leapDays(lunarYear);
+                    } else {
+                        temp = this.monthDays(lunarYear, i);
+                    }
+                    
+                    if (isLeap && i === (leap + 1)) isLeap = false;
+                    
+                    offset -= temp;
+                }
+                
+                if (offset === 0 && leap > 0 && i === leap + 1) {
+                    if (isLeap) {
+                        isLeap = false;
+                    } else {
+                        isLeap = true;
+                        i--;
+                    }
+                }
+                
+                if (offset < 0) {
+                    offset += temp;
+                    i--;
+                }
+                
+                let lunarMonth = i;
+                let lunarDay = offset + 1;
+                
+                let ganZhiYear = this.getGanZhiYear(lunarYear);
+                
+                let zodiac = this.zodiacAnimals[(lunarYear - 4) % 12];
+                
+                let lunarMonthCn = this.lunarMonths[lunarMonth - 1];
+                if (isLeap) lunarMonthCn = "闰" + lunarMonthCn;
+                
+                let lunarDayCn = this.getLunarDayCn(lunarDay);
+                
+                return {
+                    year: lunarYear,
+                    month: lunarMonth,
+                    day: lunarDay,
+                    isLeap: isLeap,
+                    yearCn: ganZhiYear + "年",
+                    monthCn: lunarMonthCn + "月",
+                    dayCn: lunarDayCn,
+                    zodiac: zodiac,
+                    ganZhiYear: ganZhiYear
+                };
+            }
+            
+            lunarYearDays(year) {
+                let sum = 348;
+                for (let i = 0x8000; i > 0x8; i >>= 1) {
+                    sum += (this.lunarInfo[year-1900] & i) ? 1 : 0;
+                }
+                return sum + this.leapDays(year);
+            }
+            
+            leapDays(year) {
+                if (this.leapMonth(year)) {
+                    return (this.lunarInfo[year-1900] & 0x10000) ? 30 : 29;
+                } else {
+                    return 0;
+                }
+            }
+            
+            leapMonth(year) {
+                return this.lunarInfo[year-1900] & 0xf;
+            }
+            
+            monthDays(year, month) {
+                return (this.lunarInfo[year-1900] & (0x10000 >> month)) ? 30 : 29;
+            }
+            
+            getLunarDayCn(day) {
+                let nStr1 = ['日', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+                let nStr2 = ['初', '十', '廿', '卅'];
+                let str = "";
+                
+                if (day <= 10) {
+                    str = nStr2[0] + nStr1[day];
+                } else if (day < 20) {
+                    str = nStr2[1] + nStr1[day - 10];
+                } else if (day === 20) {
+                    str = "二十";
+                } else if (day < 30) {
+                    str = nStr2[2] + nStr1[day - 20];
+                } else if (day === 30) {
+                    str = "三十";
+                }
+                
+                return str;
+            }
+            
+            getGanZhiYear(year) {
+                return this.tianGan[(year - 4) % 10] + this.diZhi[(year - 4) % 12];
+            }
+        }
+
+        // 基础数据
+        const baguaData = {
+            "乾": { wuxing: "金", color: "color-metal", numbers: "1,4,9", direction: "西北", luck: "大吉", meaning: "刚健有力" },
+            "兑": { wuxing: "金", color: "color-metal", numbers: "2,7", direction: "西方", luck: "吉", meaning: "喜悦沟通" },
+            "离": { wuxing: "火", color: "color-fire", numbers: "3,9", direction: "南方", luck: "中吉", meaning: "光明美丽" },
+            "震": { wuxing: "木", color: "color-wood", numbers: "4,8", direction: "东方", luck: "吉", meaning: "震动生长" },
+            "巽": { wuxing: "木", color: "color-wood", numbers: "5,8", direction: "东南", luck: "吉", meaning: "顺入柔顺" },
+            "坎": { wuxing: "水", color: "color-water", numbers: "1,6", direction: "北方", luck: "凶", meaning: "险陷困难" },
+            "艮": { wuxing: "土", color: "color-earth", numbers: "5,7,8", direction: "东北", luck: "中平", meaning: "静止稳重" },
+            "坤": { wuxing: "土", color: "color-earth", numbers: "2,5,8", direction: "西南", luck: "吉", meaning: "柔顺包容" }
+        };
+
+        const dizhiData = {
+            "子": { wuxing: "水", color: "color-water", order: 1, time: "23-1" },
+            "丑": { wuxing: "土", color: "color-earth", order: 2, time: "1-3" },
+            "寅": { wuxing: "木", color: "color-wood", order: 3, time: "3-5" },
+            "卯": { wuxing: "木", color: "color-wood", order: 4, time: "5-7" },
+            "辰": { wuxing: "土", color: "color-earth", order: 5, time: "7-9" },
+            "巳": { wuxing: "火", color: "color-fire", order: 6, time: "9-11" },
+            "午": { wuxing: "火", color: "color-fire", order: 7, time: "11-13" },
+            "未": { wuxing: "土", color: "color-earth", order: 8, time: "13-15" },
+            "申": { wuxing: "金", color: "color-metal", order: 9, time: "15-17" },
+            "酉": { wuxing: "金", color: "color-metal", order: 10, time: "17-19" },
+            "戌": { wuxing: "土", color: "color-earth", order: 11, time: "19-21" },
+            "亥": { wuxing: "水", color: "color-water", order: 12, time: "21-23" }
+        };
+
+        const flyingStarData = {
+            "一白": { wuxing: "水", color: "color-water", luck: "吉" },
+            "二黑": { wuxing: "土", color: "color-earth", luck: "凶" },
+            "三碧": { wuxing: "木", color: "color-wood", luck: "凶" },
+            "四绿": { wuxing: "木", color: "color-wood", luck: "吉" },
+            "五黄": { wuxing: "土", color: "color-earth", luck: "大凶" },
+            "六白": { wuxing: "金", color: "color-metal", luck: "吉" },
+            "七赤": { wuxing: "金", color: "color-metal", luck: "凶" },
+            "八白": { wuxing: "土", color: "color-earth", luck: "吉" },
+            "九紫": { wuxing: "火", color: "color-fire", luck: "吉" }
+        };
+
+        const palaceStructure = {
+            "中宫": { bagua: "中宫", dizhi: "无", x: 2, y: 2 },
+            "乾宫": { bagua: "乾", dizhi: "戌", x: 1, y: 1 },
+            "兑宫": { bagua: "兑", dizhi: "酉", x: 2, y: 1 },
+            "离宫": { bagua: "离", dizhi: "午", x: 3, y: 1 },
+            "震宫": { bagua: "震", dizhi: "卯", x: 1, y: 2 },
+            "坤宫": { bagua: "坤", dizhi: "未", x: 3, y: 2 },
+            "艮宫": { bagua: "艮", dizhi: "丑", x: 1, y: 3 },
+            "坎宫": { bagua: "坎", dizhi: "子", x: 2, y: 3 },
+            "巽宫": { bagua: "巽", dizhi: "辰巳", x: 3, y: 3 }
+        };
+
+        // 创建农历计算实例
+        const lunarCalendar = new LunarCalendar();
+
+        // 排盘计算函数
+        document.getElementById('calculateBtn').addEventListener('click', function() {
+            // 显示加载中
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('resultSection').style.display = 'none';
+            
+            // 模拟计算过程
+            setTimeout(calculateJiugong, 800);
+        });
+
+        function calculateJiugong() {
+            // 获取用户输入
+            const name = document.getElementById('name').value || '匿名';
+            const timeStr = document.getElementById('time').value;
+            const time = new Date(timeStr);
+            const number = parseInt(document.getElementById('number').value) || 0;
+            const chineseChar = document.getElementById('chineseChar').value || '';
+            const useNumber = document.getElementById('useNumber').checked;
+            const useChineseChar = document.getElementById('useChineseChar').checked;
+            
+            // 计算农历日期
+            const lunarDate = lunarCalendar.solarToLunar(time);
+            
+            // 计算基础信息
+            const baseInfo = calculateBaseInfo(time, number, chineseChar, useNumber, useChineseChar, lunarDate);
+            
+            // 计算飞星盘
+            const flyingStarResult = calculateFlyingStar(baseInfo);
+            
+            // 计算八卦盘
+            const baguaResult = calculateBagua(baseInfo);
+            
+            // 计算地支盘
+            const dizhiResult = calculateDizhi(baseInfo);
+            
+            // 计算十二长生关系
+            const longevityResult = calculateAllLongevity(baseInfo, dizhiResult);
+            
+            // 计算地支关系
+            const relationResult = calculateAllRelations(baseInfo, dizhiResult);
+            
+            // 生成综合解读
+            const interpretation = generateFullInterpretation(
+                baseInfo, flyingStarResult, baguaResult, dizhiResult, 
+                longevityResult, relationResult, name, lunarDate
+            );
+            
+            // 显示结果
+            displayResults(baseInfo, flyingStarResult, baguaResult, dizhiResult, interpretation, name, lunarDate);
+            
+            // 隐藏加载中，显示结果
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('resultSection').style.display = 'block';
+            
+            // 添加动画效果
+            document.getElementById('resultSection').classList.add('fade-in');
+        }
+
+        function calculateBaseInfo(time, number, chineseChar, useNumber, useChineseChar, lunarDate) {
+            // 计算阴阳
+            const month = time.getMonth() + 1;
+            const yinyang = (month >= 6 && month <= 11) ? "阳" : "阴";
+            
+            // 计算时辰地支
+            const hour = time.getHours();
+            const dizhiHour = calculateDizhiHour(hour);
+            
+            // 使用精确的农历日子地支
+            const dayDizhiList = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
+            const dayDizhi = dayDizhiList[(lunarDate.day - 1) % 12];
+            
+            // 计算日子类型（基于精确的农历日子地支）
+            let dayType;
+            if (["子", "午", "卯", "酉"].includes(dayDizhi)) {
+                dayType = "子午卯酉";
+            } else if (["寅", "申", "巳", "亥"].includes(dayDizhi)) {
+                dayType = "寅申巳亥";
+            } else {
+                dayType = "辰戌丑未";
+            }
+            
+            // 计算旋转次数
+            const minutes = time.getMinutes();
+            let rotationCount;
+            if (useNumber) {
+                rotationCount = minutes + number;
+            } else if (useChineseChar) {
+                const strokeCount = chineseChar.length;
+                rotationCount = minutes + strokeCount;
+            } else {
+                // 使用农历日子的精确日期
+                rotationCount = minutes + lunarDate.day;
+            }
+            
+            // 计算起始卦象
+            const baguaList = ["乾", "兑", "离", "震", "巽", "坎", "艮", "坤"];
+            let startBagua;
+            if (useNumber) {
+                const index = (number - 1) % 8;
+                startBagua = baguaList[index];
+            } else if (useChineseChar) {
+                const strokeCount = chineseChar.length;
+                const index = (strokeCount - 1) % 8;
+                startBagua = baguaList[index];
+            } else {
+                // 使用农历日子的精确日期
+                const index = (lunarDate.day - 1) % 8;
+                startBagua = baguaList[index];
+            }
+            
+            return {
+                time: time,
+                yinyang: yinyang,
+                dizhiHour: dizhiHour,
+                dayType: dayType,
+                rotationCount: rotationCount,
+                startBagua: startBagua,
+                minutes: minutes,
+                lunarDay: lunarDate.day,
+                dayDizhi: dayDizhi
+            };
+        }
+
+        function calculateDizhiHour(hour) {
+            const dizhiMap = [
+                {hour: [23,0], dizhi: "子"}, {hour: [1,2], dizhi: "丑"},
+                {hour: [3,4], dizhi: "寅"}, {hour: [5,6], dizhi: "卯"},
+                {hour: [7,8], dizhi: "辰"}, {hour: [9,10], dizhi: "巳"},
+                {hour: [11,12], dizhi: "午"}, {hour: [13,14], dizhi: "未"},
+                {hour: [15,16], dizhi: "申"}, {hour: [17,18], dizhi: "酉"},
+                {hour: [19,20], dizhi: "戌"}, {hour: [21,22], dizhi: "亥"}
+            ];
+            
+            for(let i = 0; i < dizhiMap.length; i++) {
+                const range = dizhiMap[i].hour;
+                if((hour >= range[0] && hour <= range[1]) || 
+                   (range[0] === 23 && (hour === 23 || hour === 0))) {
+                    return dizhiMap[i].dizhi;
+                }
+            }
+            return "子";
+        }
+
+        function calculateFlyingStar(baseInfo) {
+            const flyingStarMap = {
+                "子午卯酉阳": "一白",
+                "子午卯酉阴": "九紫",
+                "寅申巳亥阳": "七赤", 
+                "寅申巳亥阴": "三碧",
+                "辰戌丑未阳": "四绿",
+                "辰戌丑未阴": "六白"
+            };
+            
+            const key = baseInfo.dayType + baseInfo.yinyang;
+            const centerStar = flyingStarMap[key] || "一白";
+            
+            const starSequence = ["一白", "二黑", "三碧", "四绿", "五黄", "六白", "七赤", "八白", "九紫"];
+            const palaceOrder = ["中宫", "乾宫", "兑宫", "离宫", "震宫", "坤宫", "艮宫", "坎宫", "巽宫"];
+            
+            const centerIndex = starSequence.indexOf(centerStar);
+            const result = {};
+            
+            for(let i = 0; i < 9; i++) {
+                let starIndex;
+                if(baseInfo.yinyang === "阳") {
+                    starIndex = (centerIndex + i) % 9;
+                } else {
+                    starIndex = (centerIndex - i + 9) % 9;
+                }
+                result[palaceOrder[i]] = starSequence[starIndex];
+            }
+            
+            return result;
+        }
+
+        function calculateBagua(baseInfo) {
+            const baguaSequence = ["乾", "兑", "离", "震", "巽", "坎", "艮", "坤"];
+            const palaceOrder = ["乾宫", "兑宫", "离宫", "震宫", "坤宫", "艮宫", "坎宫", "巽宫"];
+            
+            const startIndex = baguaSequence.indexOf(baseInfo.startBagua);
+            const rotation = baseInfo.rotationCount % 8;
+            const result = {};
+            
+            for(let i = 0; i < 8; i++) {
+                let baguaIndex;
+                if(baseInfo.yinyang === "阳") {
+                    baguaIndex = (startIndex + rotation + i) % 8;
+                } else {
+                    baguaIndex = (startIndex - rotation - i + 16) % 8;
+                }
+                result[palaceOrder[i]] = baguaSequence[baguaIndex];
+            }
+            
+            result["中宫"] = "中宫";
+            return result;
+        }
+
+        function calculateDizhi(baseInfo) {
+            const dizhiSequence = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
+            const palaceOrder = ["乾宫", "兑宫", "离宫", "震宫", "坤宫", "艮宫", "坎宫", "巽宫"];
+            
+            const rotation = baseInfo.rotationCount % 12;
+            const result = {};
+            
+            for(let i = 0; i < 8; i++) {
+                let dizhiIndex;
+                if(baseInfo.yinyang === "阳") {
+                    dizhiIndex = (i - rotation + 12) % 12;
+                } else {
+                    dizhiIndex = (i + rotation) % 12;
+                }
+                result[palaceOrder[i]] = dizhiSequence[dizhiIndex];
+            }
+            
+            result["中宫"] = "无";
+            return result;
+        }
+
+        function calculateAllLongevity(baseInfo, dizhiResult) {
+            const result = {};
+            const palaces = ["乾宫", "兑宫", "离宫", "震宫", "坤宫", "艮宫", "坎宫", "巽宫"];
+            
+            palaces.forEach(function(palace) {
+                const palaceDizhi = dizhiResult[palace];
+                result[palace] = calculateTwelveLongevity(baseInfo.dizhiHour, palaceDizhi);
+            });
+            
+            result["中宫"] = "无";
+            return result;
+        }
+
+        function calculateTwelveLongevity(hourDizhi, palaceDizhi) {
+            const dizhiWuXing = {
+                "子": "水", "亥": "水",
+                "寅": "木", "卯": "木", 
+                "巳": "火", "午": "火",
+                "申": "金", "酉": "金",
+                "辰": "土", "戌": "土", "丑": "土", "未": "土"
+            };
+            
+            const longevitySequence = {
+                "木": ["亥", "子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌"],
+                "火": ["寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥", "子", "丑"],
+                "土": ["申", "酉", "戌", "亥", "子", "丑", "寅", "卯", "辰", "巳", "午", "未"],
+                "金": ["巳", "午", "未", "申", "酉", "戌", "亥", "子", "丑", "寅", "卯", "辰"],
+                "水": ["申", "酉", "戌", "亥", "子", "丑", "寅", "卯", "辰", "巳", "午", "未"]
+            };
+            
+            const longevityNames = ["长生", "沐浴", "冠带", "临官", "帝旺", "衰", "病", "死", "墓", "绝", "胎", "养"];
+            
+            const hourWuXing = dizhiWuXing[hourDizhi];
+            if (!hourWuXing || !longevitySequence[hourWuXing]) return "无";
+            
+            const sequence = longevitySequence[hourWuXing];
+            const index = sequence.indexOf(palaceDizhi);
+            
+            return index !== -1 ? longevityNames[index] : "无";
+        }
+
+        function calculateAllRelations(baseInfo, dizhiResult) {
+            const result = {};
+            const palaces = ["乾宫", "兑宫", "离宫", "震宫", "坤宫", "艮宫", "坎宫", "巽宫"];
+            
+            palaces.forEach(function(palace) {
+                const palaceDizhi = dizhiResult[palace];
+                result[palace] = calculateDizhiRelations(baseInfo.dizhiHour, palaceDizhi);
+            });
+            
+            result["中宫"] = "无";
+            return result;
+        }
+
+        function calculateDizhiRelations(hourDizhi, palaceDizhi) {
+            const relations = [];
+            
+            // 六合关系
+            const liuhe = [["子", "丑"], ["寅", "亥"], ["卯", "戌"], 
+                           ["辰", "酉"], ["巳", "申"], ["午", "未"]];
+            
+            // 六冲关系  
+            const liuchong = [["子", "午"], ["丑", "未"], ["寅", "申"],
+                              ["卯", "酉"], ["辰", "戌"], ["巳", "亥"]];
+            
+            // 三合关系
+            const sanhe = [["申", "子", "辰"], ["亥", "卯", "未"], 
+                           ["寅", "午", "戌"], ["巳", "酉", "丑"]];
+            
+            // 检查六合
+            liuhe.forEach(function(pair) {
+                if((pair[0] === hourDizhi && pair[1] === palaceDizhi) ||
+                   (pair[1] === hourDizhi && pair[0] === palaceDizhi)) {
+                    relations.push("六合");
+                }
+            });
+            
+            // 检查六冲
+            liuchong.forEach(function(pair) {
+                if((pair[0] === hourDizhi && pair[1] === palaceDizhi) ||
+                   (pair[1] === hourDizhi && pair[0] === palaceDizhi)) {
+                    relations.push("六冲");
+                }
+            });
+            
+            // 检查三合
+            sanhe.forEach(function(combination) {
+                if(combination.includes(hourDizhi) && combination.includes(palaceDizhi)) {
+                    relations.push("三合");
+                }
+            });
+            
+            return relations.length > 0 ? relations.join(",") : "无特殊关系";
+        }
+
+        function generateFullInterpretation(baseInfo, flyingStar, bagua, dizhi, longevity, relations, name, lunarDate) {
+            let interpretation = `<p><strong>${name}的九宫神卦排盘解读：</strong></p>`;
+            
+            interpretation += `<p>本次排盘基于${baseInfo.yinyang}遁，${baseInfo.dayType}日，${baseInfo.dizhiHour}时起卦。</p>`;
+            interpretation += `<p>飞星${flyingStar["中宫"]}入中宫，主导${getStarMeaning(flyingStar["中宫"])}。</p>`;
+            
+            interpretation += "<p><strong>各宫位分析：</strong></p>";
+            
+            const palaceOrder = ["中宫", "乾宫", "兑宫", "离宫", "震宫", "坤宫", "艮宫", "坎宫", "巽宫"];
+            
+            palaceOrder.forEach(function(palace) {
+                interpretation += `<p><strong>${palace}：</strong>`;
+                interpretation += `${flyingStar[palace]}星 + ${bagua[palace]}卦 + ${dizhi[palace]}地支`;
+                
+                if(longevity[palace] !== "无") {
+                    interpretation += `，十二长生：${longevity[palace]}`;
+                }
+                
+                if(relations[palace] !== "无特殊关系") {
+                    interpretation += `，地支关系：${relations[palace]}`;
+                }
+                
+                interpretation += "</p>";
+            });
+            
+            return interpretation;
+        }
+
+        function getStarMeaning(star) {
+            const meaningMap = {
+                "一白": "财运人际", "二黑": "健康病符", "三碧": "是非口舌",
+                "四绿": "文昌学业", "五黄": "灾祸意外", "六白": "权贵事业",
+                "七赤": "破财盗贼", "八白": "正财吉庆", "九紫": "喜事桃花"
+            };
+            return meaningMap[star] || "";
+        }
+
+        function displayResults(baseInfo, flyingStar, bagua, dizhi, interpretation, name, lunarDate) {
+            // 显示时间信息
+            const timeInfo = document.getElementById('timeInfo');
+            const timeStr = baseInfo.time.toLocaleString('zh-CN');
+            timeInfo.innerHTML = `
+                <div><strong>公历时间：</strong>${timeStr}</div>
+                <div><strong>农历时间：</strong>${lunarDate.yearCn}${lunarDate.monthCn}${lunarDate.dayCn}</div>
+                <div><strong>生肖年份：</strong>${lunarDate.zodiac}年</div>
+                <div><strong>阴阳：</strong>${baseInfo.yinyang}</div>
+                <div><strong>时辰：</strong>${baseInfo.dizhiHour}时</div>
+                <div><strong>姓名：</strong>${name}</div>
+            `;
+            
+            // 生成九宫格
+            const jiugongGrid = document.getElementById('jiugongGrid');
+            jiugongGrid.innerHTML = '';
+            
+            const palaceOrder = ["中宫", "乾宫", "兑宫", "离宫", "震宫", "坤宫", "艮宫", "坎宫", "巽宫"];
+            
+            palaceOrder.forEach(function(palace) {
+                const palaceDiv = document.createElement('div');
+                palaceDiv.className = 'palace';
+                
+                const fixedBagua = palaceStructure[palace].bagua;
+                const fixedDizhi = palaceStructure[palace].dizhi;
+                const currentFlyingStar = flyingStar[palace];
+                const currentBagua = bagua[palace];
+                const currentDizhi = dizhi[palace];
+                
+                // 获取颜色类
+                const flyingStarColor = flyingStarData[currentFlyingStar] ? flyingStarData[currentFlyingStar].color : '';
+                const baguaColor = baguaData[currentBagua] ? baguaData[currentBagua].color : '';
+                const dizhiColor = dizhiData[currentDizhi] ? dizhiData[currentDizhi].color : '';
+                
+                palaceDiv.innerHTML = `
+                    <div class="palace-name">${palace}</div>
+                    <div class="palace-content">
+                        <div class="palace-item fixed-info">
+                            <span>固定八卦:</span> <span>${fixedBagua}</span>
+                        </div>
+                        <div class="palace-item fixed-info">
+                            <span>固定地支:</span> <span>${fixedDizhi}</span>
+                        </div>
+                        <div class="palace-item ${flyingStarColor}">
+                            <span>飞星:</span> <span>${currentFlyingStar}</span>
+                        </div>
+                        <div class="palace-item ${baguaColor}">
+                            <span>动八卦:</span> <span>${currentBagua}</span>
+                        </div>
+                        <div class="palace-item ${dizhiColor}">
+                            <span>动地支:</span> <span>${currentDizhi}</span>
+                        </div>
+                    </div>
+                `;
+                
+                jiugongGrid.appendChild(palaceDiv);
+            });
+            
+            // 显示解读
+            document.getElementById('interpretationContent').innerHTML = interpretation;
+        }
+    </script>
+</body>
+</html>
